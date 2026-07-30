@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record AgendaRequestDTO(
 
-        @NotBlank
+        @NotBlank(message = "Nome da pauta é obrigatório")
         String name,
 
         String description
