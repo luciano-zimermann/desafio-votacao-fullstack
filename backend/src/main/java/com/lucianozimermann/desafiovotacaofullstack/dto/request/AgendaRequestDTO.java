@@ -10,6 +10,5 @@ public record AgendaRequestDTO(
         String name,
 
         String description
-
 ) {
 }

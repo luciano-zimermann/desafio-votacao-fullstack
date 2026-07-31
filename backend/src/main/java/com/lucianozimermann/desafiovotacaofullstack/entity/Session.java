@@ -1,6 +1,5 @@
 package com.lucianozimermann.desafiovotacaofullstack.entity;
 
-import com.lucianozimermann.desafiovotacaofullstack.enums.SessionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +29,4 @@ public class Session {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SessionStatus status;
 }
