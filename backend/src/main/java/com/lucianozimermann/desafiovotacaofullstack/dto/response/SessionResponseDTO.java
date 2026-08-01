@@ -1,5 +1,6 @@
 package com.lucianozimermann.desafiovotacaofullstack.dto.response;
 
+import com.lucianozimermann.desafiovotacaofullstack.enums.SessionStatus;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,8 @@ public record SessionResponseDTO(
         Long agendaId,
         Integer duration,
         LocalDateTime startDate,
-        LocalDateTime endDate
+        LocalDateTime endDate,
+        SessionStatus status
 
 ) {
 }

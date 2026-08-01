@@ -4,6 +4,7 @@ import com.lucianozimermann.desafiovotacaofullstack.dto.request.SessionRequestDT
 import com.lucianozimermann.desafiovotacaofullstack.dto.response.SessionResponseDTO;
 import com.lucianozimermann.desafiovotacaofullstack.entity.Agenda;
 import com.lucianozimermann.desafiovotacaofullstack.entity.Session;
+import com.lucianozimermann.desafiovotacaofullstack.enums.SessionStatus;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AgendaNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.exception.SessionAlreadyOpenException;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AgendaRepository;
@@ -46,12 +47,17 @@ public class SessionService {
     }
 
     private SessionResponseDTO buildSessionResponseDTO(Session session) {
+        SessionStatus status = session.getEndDate().isAfter(LocalDateTime.now())
+                ? SessionStatus.OPEN
+                : SessionStatus.CLOSED;
+
         return SessionResponseDTO.builder()
                                  .id(session.getId())
                                  .agendaId(session.getAgenda().getId())
                                  .duration(session.getDuration())
                                  .startDate(session.getStartDate())
                                  .endDate(session.getEndDate())
+                                 .status( status )
                                  .build();
     }
 }
