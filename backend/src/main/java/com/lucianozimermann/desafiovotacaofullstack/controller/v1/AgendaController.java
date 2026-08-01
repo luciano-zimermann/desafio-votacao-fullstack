@@ -25,6 +25,6 @@ public class AgendaController {
     public ResponseEntity<AgendaResponseDTO> register(@Valid @RequestBody AgendaRequestDTO dto) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(service.create(dto));
+                             .body(service.register(dto));
     }
 }

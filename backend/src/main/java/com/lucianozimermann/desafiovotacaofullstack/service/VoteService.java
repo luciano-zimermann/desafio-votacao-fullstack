@@ -24,7 +24,7 @@ public class VoteService {
     private final SessionRepository sessionRepository;
     private final AssociateRepository associateRepository;
 
-    public VoteResponseDTO create(VoteRequestDTO dto) {
+    public VoteResponseDTO register(VoteRequestDTO dto) {
         Session session = sessionRepository.findById(dto.sessionId())
                                            .orElseThrow(SessionNotFoundException::new);
 

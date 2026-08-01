@@ -22,6 +22,6 @@ public class AssociateController {
     @PostMapping
     public ResponseEntity<AssociateResponseDTO> register(@Valid @RequestBody AssociateRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(service.create(dto));
+                             .body(service.register(dto));
     }
 }

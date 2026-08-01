@@ -65,7 +65,7 @@ class AgendaControllerTest {
     void shouldReturn201WhenRequestIsValid() throws Exception {
         AgendaRequestDTO request = new AgendaRequestDTO(AGENDA_NAME, AGENDA_DESCRIPTION);
 
-        Mockito.when(service.create(Mockito.any(AgendaRequestDTO.class))).thenReturn(buildAgendaResponse());
+        Mockito.when(service.register(Mockito.any(AgendaRequestDTO.class))).thenReturn(buildAgendaResponse());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/agendas")
                                               .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ class AgendaControllerTest {
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        Mockito.verify(service, Mockito.never()).create(Mockito.any());
+        Mockito.verify(service, Mockito.never()).register(Mockito.any());
     }
 
     private AgendaResponseDTO buildAgendaResponse() {

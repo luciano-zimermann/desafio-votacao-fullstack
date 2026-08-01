@@ -46,7 +46,7 @@ class AssociateControllerTest {
     void shouldReturn201WhenRequestIsValid() throws Exception {
         AssociateRequestDTO request = new AssociateRequestDTO(ASSOCIATE_NAME, ASSOCIATE_CPF);
 
-        Mockito.when(service.create(Mockito.any(AssociateRequestDTO.class))).thenReturn(buildAssociateResponse());
+        Mockito.when(service.register(Mockito.any(AssociateRequestDTO.class))).thenReturn(buildAssociateResponse());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/associates")
                                               .contentType(MediaType.APPLICATION_JSON)
@@ -61,7 +61,7 @@ class AssociateControllerTest {
     void shouldReturn409WhenCpfAlreadyExists() throws Exception {
         AssociateRequestDTO request = new AssociateRequestDTO(ASSOCIATE_NAME, ASSOCIATE_CPF);
 
-        Mockito.when(service.create(Mockito.any(AssociateRequestDTO.class))).thenThrow(new AssociateAlreadyExistsException());
+        Mockito.when(service.register(Mockito.any(AssociateRequestDTO.class))).thenThrow(new AssociateAlreadyExistsException());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/associates")
                                               .contentType(MediaType.APPLICATION_JSON)
@@ -79,7 +79,7 @@ class AssociateControllerTest {
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        Mockito.verify(service, Mockito.never()).create(Mockito.any());
+        Mockito.verify(service, Mockito.never()).register(Mockito.any());
     }
 
     @Test
@@ -92,7 +92,7 @@ class AssociateControllerTest {
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        Mockito.verify(service, Mockito.never()).create(Mockito.any());
+        Mockito.verify(service, Mockito.never()).register(Mockito.any());
     }
 
     private AssociateResponseDTO buildAssociateResponse() {

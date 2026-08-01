@@ -20,7 +20,7 @@ public class VoteController {
     @PostMapping
     public ResponseEntity<VoteResponseDTO> register(@Valid @RequestBody VoteRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(service.create(dto));
+                             .body(service.register(dto));
     }
 
     @GetMapping("/results/{agendaId}")

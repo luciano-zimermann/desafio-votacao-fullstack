@@ -25,7 +25,7 @@ public class AgendaService {
                                 .build();
     }
 
-    public AgendaResponseDTO create(AgendaRequestDTO dto) {
+    public AgendaResponseDTO register(AgendaRequestDTO dto) {
         Agenda agenda = Agenda.builder()
                               .name(dto.name())
                               .description(dto.description())

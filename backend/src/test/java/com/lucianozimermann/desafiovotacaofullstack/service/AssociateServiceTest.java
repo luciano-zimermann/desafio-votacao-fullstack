@@ -36,7 +36,7 @@ class AssociateServiceTest {
         Mockito.when(repository.existsByCpf(ASSOCIATE_CPF_NORMALIZED)).thenReturn(false);
         Mockito.when(repository.save(Mockito.any(Associate.class))).thenReturn(buildAssociate());
 
-        AssociateResponseDTO response = service.create(request);
+        AssociateResponseDTO response = service.register(request);
 
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.id()).isEqualTo(ASSOCIATE_ID);
@@ -54,7 +54,7 @@ class AssociateServiceTest {
 
         Mockito.when(repository.existsByCpf(ASSOCIATE_CPF_NORMALIZED)).thenReturn(true);
 
-        Assertions.assertThatThrownBy(() -> service.create(request)).isInstanceOf(AssociateAlreadyExistsException.class);
+        Assertions.assertThatThrownBy(() -> service.register(request)).isInstanceOf(AssociateAlreadyExistsException.class);
 
         Mockito.verify(repository, Mockito.never()).save(Mockito.any(Associate.class));
     }

@@ -38,7 +38,7 @@ class AgendaServiceTest {
 
         Mockito.when(repository.save(Mockito.any(Agenda.class))).thenReturn(agenda);
 
-        AgendaResponseDTO response = service.create(request);
+        AgendaResponseDTO response = service.register(request);
 
         Assertions.assertThat( response).isNotNull();
         Assertions.assertThat(response.id()).isEqualTo(AGENDA_ID);

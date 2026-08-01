@@ -15,7 +15,7 @@ public class AssociateService {
 
     private final AssociateRepository repository;
 
-    public AssociateResponseDTO create(AssociateRequestDTO dto) {
+    public AssociateResponseDTO register(AssociateRequestDTO dto) {
         String cpf = CpfUtils.stripCpfMask(dto.cpf());
 
         if (repository.existsByCpf(cpf)) {
