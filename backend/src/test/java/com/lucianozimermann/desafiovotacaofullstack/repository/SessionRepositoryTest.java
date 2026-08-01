@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @DataJpaTest
 class SessionRepositoryTest {
@@ -45,6 +46,21 @@ class SessionRepositoryTest {
         boolean exists = repository.existsByAgendaIdAndEndDateAfter(agenda.getId(), LocalDateTime.now());
 
         Assertions.assertThat(exists).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar a sessão mais recente da pauta")
+    void shouldReturnMostRecentSessionForAgenda() {
+        Agenda agenda = agendaRepository.save(buildAgenda());
+        LocalDateTime now = LocalDateTime.now();
+
+        repository.save(buildSession(agenda, now.minusMinutes(10), now.minusMinutes(9)));
+        Session mostRecent = repository.save(buildSession(agenda, now, now.plusMinutes(DURATION)));
+
+        Optional<Session> found = repository.findFirstByAgendaIdOrderByStartDateDesc( agenda.getId());
+
+        Assertions.assertThat(found).isPresent();
+        Assertions.assertThat(found.get().getId()).isEqualTo(mostRecent.getId());
     }
 
     @Test
