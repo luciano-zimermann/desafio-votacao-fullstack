@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/v1/associates")
+@RequestMapping(value = ApiPaths.ASSOCIATES)
 @RequiredArgsConstructor
 public class AssociateController {
 

@@ -45,7 +45,7 @@ class AgendaControllerTest {
     void shouldReturn200WhenAgendaExists() throws Exception {
         Mockito.when(service.findById(AGENDA_ID)).thenReturn(buildAgendaResponse());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/agendas/{id}", AGENDA_ID))
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.AGENDAS + "/{id}", AGENDA_ID))
                .andExpect(MockMvcResultMatchers.status().isOk())
                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(AGENDA_ID))
                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(AGENDA_NAME));
@@ -56,7 +56,7 @@ class AgendaControllerTest {
     void shouldReturn404WhenAgendaDoesNotExist() throws Exception {
         Mockito.when(service.findById(AGENDA_ID)).thenThrow(new AgendaNotFoundException());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/agendas/{id}", AGENDA_ID))
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.AGENDAS + "/{id}", AGENDA_ID))
                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -67,7 +67,7 @@ class AgendaControllerTest {
 
         Mockito.when(service.register(Mockito.any(AgendaRequestDTO.class))).thenReturn(buildAgendaResponse());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/agendas")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.AGENDAS)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -79,7 +79,7 @@ class AgendaControllerTest {
     void shouldReturn400WhenNameIsBlank() throws Exception {
         AgendaRequestDTO request = new AgendaRequestDTO("", AGENDA_DESCRIPTION);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/agendas")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.AGENDAS)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());

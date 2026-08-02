@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/v1/agendas")
+@RequestMapping(value = ApiPaths.AGENDAS)
 @RequiredArgsConstructor
 public class AgendaController {
 

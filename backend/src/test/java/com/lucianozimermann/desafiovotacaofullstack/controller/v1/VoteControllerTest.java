@@ -50,7 +50,7 @@ class VoteControllerTest {
 
         Mockito.when(service.register(Mockito.any(VoteRequestDTO.class))).thenReturn(buildVoteResponse());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/votes")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.VOTES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -65,7 +65,7 @@ class VoteControllerTest {
 
         Mockito.when(service.register(Mockito.any(VoteRequestDTO.class))).thenThrow(new SessionNotFoundException());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/votes")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.VOTES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -78,7 +78,7 @@ class VoteControllerTest {
 
         Mockito.when(service.register(Mockito.any(VoteRequestDTO.class))).thenThrow(new AssociateNotFoundException());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/votes")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.VOTES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -91,7 +91,7 @@ class VoteControllerTest {
 
         Mockito.when(service.register(Mockito.any(VoteRequestDTO.class))).thenThrow(new SessionClosedException());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/votes")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.VOTES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isConflict());
@@ -104,7 +104,7 @@ class VoteControllerTest {
 
         Mockito.when(service.register(Mockito.any(VoteRequestDTO.class))).thenThrow(new VoteAlreadyExistsException());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/votes")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.VOTES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isConflict());
@@ -115,7 +115,7 @@ class VoteControllerTest {
     void shouldReturn400WhenVoteIsNull() throws Exception {
         VoteRequestDTO request = new VoteRequestDTO(SESSION_ID, ASSOCIATE_ID, null);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/votes")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.VOTES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -128,7 +128,7 @@ class VoteControllerTest {
     void shouldReturn200WithVoteResult() throws Exception {
         Mockito.when(service.getResult(AGENDA_ID)).thenReturn(buildVoteResult());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/votes/results/{agendaId}", AGENDA_ID))
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.VOTES + "/results/{agendaId}", AGENDA_ID))
                .andExpect(MockMvcResultMatchers.status().isOk())
                .andExpect(MockMvcResultMatchers.jsonPath("$.result").value("Aprovada"))
                .andExpect(MockMvcResultMatchers.jsonPath("$.totalVotes").value(4))

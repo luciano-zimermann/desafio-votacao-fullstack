@@ -51,7 +51,7 @@ class SessionControllerTest {
 
         Mockito.when(service.open(Mockito.any(SessionRequestDTO.class))).thenReturn(buildSessionResponse());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/sessions")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.SESSIONS)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -66,7 +66,7 @@ class SessionControllerTest {
 
         Mockito.when(service.open(Mockito.any(SessionRequestDTO.class))).thenThrow(new AgendaNotFoundException());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/sessions")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.SESSIONS)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -79,7 +79,7 @@ class SessionControllerTest {
 
         Mockito.when(service.open(Mockito.any(SessionRequestDTO.class))).thenThrow(new SessionAlreadyOpenException());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/sessions")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.SESSIONS)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isConflict());
@@ -90,7 +90,7 @@ class SessionControllerTest {
     void shouldReturn400WhenAgendaIdIsNull() throws Exception {
         SessionRequestDTO request = new SessionRequestDTO(null, DURATION);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/sessions")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.SESSIONS)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());

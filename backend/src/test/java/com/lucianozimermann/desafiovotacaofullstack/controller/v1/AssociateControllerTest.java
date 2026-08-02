@@ -48,7 +48,7 @@ class AssociateControllerTest {
 
         Mockito.when(service.register(Mockito.any(AssociateRequestDTO.class))).thenReturn(buildAssociateResponse());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/associates")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.ASSOCIATES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -63,7 +63,7 @@ class AssociateControllerTest {
 
         Mockito.when(service.register(Mockito.any(AssociateRequestDTO.class))).thenThrow(new AssociateAlreadyExistsException());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/associates")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.ASSOCIATES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isConflict());
@@ -74,7 +74,7 @@ class AssociateControllerTest {
     void shouldReturn400WhenCpfIsInvalid() throws Exception {
         AssociateRequestDTO request = new AssociateRequestDTO(ASSOCIATE_NAME, INVALID_CPF);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/associates")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.ASSOCIATES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -87,7 +87,7 @@ class AssociateControllerTest {
     void shouldReturn400WhenNameIsBlank() throws Exception {
         AssociateRequestDTO request = new AssociateRequestDTO("", ASSOCIATE_CPF);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/associates")
+        mockMvc.perform(MockMvcRequestBuilders.post(ApiPaths.ASSOCIATES)
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isBadRequest());
