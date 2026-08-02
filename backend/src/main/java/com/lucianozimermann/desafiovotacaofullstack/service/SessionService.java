@@ -10,10 +10,12 @@ import com.lucianozimermann.desafiovotacaofullstack.exception.SessionAlreadyOpen
 import com.lucianozimermann.desafiovotacaofullstack.repository.AgendaRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SessionService {
@@ -25,9 +27,13 @@ public class SessionService {
 
     public SessionResponseDTO open(SessionRequestDTO dto) {
         Agenda agenda = agendaRepository.findById(dto.agendaId())
-                                        .orElseThrow(AgendaNotFoundException::new);
+                                        .orElseThrow(() -> {
+                                            log.warn("Tentativa de abrir sessão para uma pauta inexistente. agendaId={}", dto.agendaId());
+                                            return new AgendaNotFoundException();
+                                        });
 
         if (repository.existsByAgendaIdAndEndDateAfter(agenda.getId(), LocalDateTime.now())) {
+            log.warn("Tentativa de abrir uma sessão já existente para a pauta. agendaId={}", agenda.getId());
             throw new SessionAlreadyOpenException();
         }
 
@@ -42,6 +48,8 @@ public class SessionService {
                                  .build();
 
         session = repository.save(session);
+
+        log.info("Sessão aberta com sucesso. sessionId={}, agendaId={}, duration={}min", session.getId(), agenda.getId(), duration);
 
         return buildSessionResponseDTO(session);
     }

@@ -7,8 +7,10 @@ import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateAlreadyEx
 import com.lucianozimermann.desafiovotacaofullstack.repository.AssociateRepository;
 import com.lucianozimermann.desafiovotacaofullstack.utils.CpfUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssociateService {
@@ -19,6 +21,7 @@ public class AssociateService {
         String cpf = CpfUtils.stripCpfMask(dto.cpf());
 
         if (repository.existsByCpf(cpf)) {
+            log.warn("Tentativa de cadastrar um associado com CPF já existente.");
             throw new AssociateAlreadyExistsException();
         }
 
@@ -28,6 +31,8 @@ public class AssociateService {
                                        .build();
 
         associate = repository.save(associate);
+
+        log.info("Associado cadastrado com sucesso. id={}", associate.getId());
 
         return buildAssociateResponseDTO(associate);
     }

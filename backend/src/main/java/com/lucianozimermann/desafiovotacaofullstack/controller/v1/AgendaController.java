@@ -5,10 +5,12 @@ import com.lucianozimermann.desafiovotacaofullstack.dto.response.AgendaResponseD
 import com.lucianozimermann.desafiovotacaofullstack.service.AgendaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping(value = ApiPaths.AGENDAS)
 @RequiredArgsConstructor
@@ -18,13 +20,15 @@ public class AgendaController {
 
     @GetMapping(value = "{id}")
     public ResponseEntity<AgendaResponseDTO> findById(@PathVariable Long id) {
+        log.info("GET /agendas/{} - Buscando pauta", id);
+
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
     public ResponseEntity<AgendaResponseDTO> register(@Valid @RequestBody AgendaRequestDTO dto) {
+        log.info("POST /agendas - Criando pauta: {}", dto.name());
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(service.register(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.register(dto));
     }
 }

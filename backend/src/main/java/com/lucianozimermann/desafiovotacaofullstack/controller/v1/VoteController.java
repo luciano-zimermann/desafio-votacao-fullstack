@@ -6,10 +6,12 @@ import com.lucianozimermann.desafiovotacaofullstack.dto.response.VoteResultRespo
 import com.lucianozimermann.desafiovotacaofullstack.service.VoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping(value = ApiPaths.VOTES)
 @RequiredArgsConstructor
@@ -19,12 +21,15 @@ public class VoteController {
 
     @PostMapping
     public ResponseEntity<VoteResponseDTO> register(@Valid @RequestBody VoteRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(service.register(dto));
+        log.info("POST /votes - Registrando voto: sessionId={}, associateId={}", dto.sessionId(), dto.associateId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.register(dto));
     }
 
     @GetMapping("/results/{agendaId}")
     public ResponseEntity<VoteResultResponseDTO> getResult(@PathVariable Long agendaId) {
+        log.info("GET /votes/results/{} - Consultando resultado da pauta", agendaId);
+
         return ResponseEntity.ok(service.getResult(agendaId));
     }
 }

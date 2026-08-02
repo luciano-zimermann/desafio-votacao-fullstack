@@ -14,8 +14,10 @@ import com.lucianozimermann.desafiovotacaofullstack.repository.SessionRepository
 import com.lucianozimermann.desafiovotacaofullstack.repository.VoteRepository;
 import com.lucianozimermann.desafiovotacaofullstack.utils.SessionUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VoteService {
@@ -26,18 +28,26 @@ public class VoteService {
 
     public VoteResponseDTO register(VoteRequestDTO dto) {
         Session session = sessionRepository.findById(dto.sessionId())
-                                           .orElseThrow(SessionNotFoundException::new);
+                                           .orElseThrow(() -> {
+                                               log.warn("Tentativa de votar em uma sessão inexistente. sessionId={}", dto.sessionId());
+                                               return new SessionNotFoundException();
+                                           });
 
         Associate associate = associateRepository.findById(dto.associateId())
-                                                 .orElseThrow(AssociateNotFoundException::new);
+                                                 .orElseThrow(() -> {
+                                                     log.warn("Tentativa de voto de associado inexistente. associateId={}", dto.associateId());
+                                                     return new AssociateNotFoundException();
+                                                 });
 
         if (!SessionUtils.isOpen(session)) {
+            log.warn("Tentativa de voto em uma sessão encerrada. sessionId={}", session.getId());
             throw new SessionClosedException();
         }
 
         Long agendaId = session.getAgenda().getId();
 
         if (repository.existsByAssociateIdAndSessionAgendaId(associate.getId(), agendaId)) {
+            log.warn("Tentativa de voto duplicado. associateId={}, agendaId={}", associate.getId(), agendaId);
             throw new VoteAlreadyExistsException();
         }
 
@@ -48,6 +58,8 @@ public class VoteService {
                         .build();
 
         vote = repository.save(vote);
+
+        log.info("Voto registrado com sucesso. voteId={}, sessionId={}, associateId={}", vote.getId(), session.getId(), associate.getId());
 
         return buildVoteResponseDTO(vote);
     }
@@ -63,6 +75,8 @@ public class VoteService {
                                                        .map(session -> SessionUtils.isOpen(session) ? SessionStatus.OPEN
                                                                                                     : SessionStatus.CLOSED)
                                                        .orElse(null);
+
+        log.info("Resultado da Pauta apurado. agendaId={}, totalVotes={}, result={}", agendaId, totalVotes, result);
 
         return VoteResultResponseDTO.builder()
                                     .agendaId(agendaId)

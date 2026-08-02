@@ -6,8 +6,10 @@ import com.lucianozimermann.desafiovotacaofullstack.entity.Agenda;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AgendaNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AgendaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgendaService {
@@ -16,7 +18,10 @@ public class AgendaService {
 
     public AgendaResponseDTO findById(Long id) {
         Agenda agenda = repository.findById(id)
-                                  .orElseThrow(AgendaNotFoundException::new);
+                                  .orElseThrow(() -> {
+                                      log.warn("Tenativa de buscar uma pauta inexistente. id={}", id);
+                                      return new AgendaNotFoundException();
+                                  });
 
         return AgendaResponseDTO.builder()
                                 .id(agenda.getId())
@@ -32,6 +37,8 @@ public class AgendaService {
                               .build();
 
         agenda = repository.save(agenda);
+
+        log.info("Pauta registrada com sucesso. id={}", agenda.getId());
 
         return buildAgendaResponseDTO(agenda);
     }
