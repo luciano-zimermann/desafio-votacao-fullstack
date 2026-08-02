@@ -1,4 +1,4 @@
-package com.lucianozimermann.desafiovotacaofullstack.controller.v1;
+package com.lucianozimermann.desafiovotacaofullstack.controller.api.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lucianozimermann.desafiovotacaofullstack.dto.request.AssociateRequestDTO;

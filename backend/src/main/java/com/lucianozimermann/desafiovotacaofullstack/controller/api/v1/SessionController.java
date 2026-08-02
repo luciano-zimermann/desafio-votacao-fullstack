@@ -1,4 +1,4 @@
-package com.lucianozimermann.desafiovotacaofullstack.controller.v1;
+package com.lucianozimermann.desafiovotacaofullstack.controller.api.v1;
 
 import com.lucianozimermann.desafiovotacaofullstack.dto.request.SessionRequestDTO;
 import com.lucianozimermann.desafiovotacaofullstack.dto.response.SessionResponseDTO;
