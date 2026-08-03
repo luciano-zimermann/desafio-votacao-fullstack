@@ -1,5 +1,6 @@
 package com.lucianozimermann.desafiovotacaofullstack.controller.api.v1;
 
+import com.lucianozimermann.desafiovotacaofullstack.controller.api.v1.swagger.AgendaSwagger;
 import com.lucianozimermann.desafiovotacaofullstack.dto.request.AgendaRequestDTO;
 import com.lucianozimermann.desafiovotacaofullstack.dto.response.AgendaResponseDTO;
 import com.lucianozimermann.desafiovotacaofullstack.service.AgendaService;
@@ -16,10 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping(value = ApiPaths.AGENDAS)
 @RequiredArgsConstructor
-public class AgendaController {
+public class AgendaController implements AgendaSwagger {
 
     private final AgendaService service;
 
+    @Override
     @GetMapping(value = "{id}")
     public ResponseEntity<AgendaResponseDTO> findById(@PathVariable Long id) {
         log.info("GET /agendas/{} - Buscando pauta", id);
@@ -27,6 +29,7 @@ public class AgendaController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<List<AgendaResponseDTO>> findAll() {
         log.info("GET /agendas - Listando todas as pautas");
@@ -34,6 +37,7 @@ public class AgendaController {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<AgendaResponseDTO> register(@Valid @RequestBody AgendaRequestDTO dto) {
         log.info("POST /agendas - Criando pauta: {}", dto.name());
