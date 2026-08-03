@@ -1,86 +1,112 @@
-# Votação
+# Assembleia de Votação
 
-## Objetivo
+## Descrição
 
-No cooperativismo, cada associado possui um voto e as decisões são tomadas em assembleias, por votação. Imagine que você deve criar uma solução we para gerenciar e participar dessas sessões de votação.
-Essa solução deve ser executada na nuvem e promover as seguintes funcionalidades através de uma API REST / Front:
+Este projeto implementa uma aplicação fullstack para gerenciamento de assembleias, permitindo o cadastro e consulta de associados, criação de pautas, abertura de sessões de votação, registro de votos e extração dos resultados consolidados. O projeto é dividido em backend (API REST) e frontend (interface web).
 
-- Cadastrar uma nova pauta
-- Abrir uma sessão de votação em uma pauta (a sessão de votação deve ficar aberta por
-  um tempo determinado na chamada de abertura ou 1 minuto por default)
-- Receber votos dos associados em pautas (os votos são apenas 'Sim'/'Não'. Cada associado
-  é identificado por um id único e pode votar apenas uma vez por pauta)
-- Contabilizar os votos e dar o resultado da votação na pauta
+A aplicação foi desenvolvida utilizando as seguintes tecnologias: Spring Boot, Java 21, Spring Data JPA, PostgreSQL, Lombok, SLF4J, Swagger, JUnit, Mockito, React e Docker.
 
-Para fins de exercício, a segurança das interfaces pode ser abstraída e qualquer chamada para as interfaces pode ser considerada como autorizada. A solução deve ser construída em java com Spring-boot e Angular/React conforme orientação, mas os frameworks e bibliotecas são de livre escolha (desde que não infrinja direitos de uso).
+## Regras de Negócio
 
-É importante que as pautas e os votos sejam persistidos e que não sejam perdidos com o restart da aplicação.
+- Pautas, associados e sessões devem existir antes do registro de votos.
+- Cada associado pode votar apenas uma vez em cada pauta.
+- Uma pauta pode possuir apenas uma sessão de votação aberta por vez.
+- A sessão de votação possui um tempo de duração configurável (1 minuto como padrão) e é encerrada automaticamente ao finalizar.
+- Votos só podem ser registrados enquanto a sessão estiver aberta.
+- O resultado da votação pode ser consultado a qualquer momento e retorna o status da sessão (`OPEN` ou `CLOSED`) e a contagem dos votos.
+- Em caso de empate, a pauta é considerada rejeitada.
+- O CPF do associado é validado no cadastro.
 
-## Como proceder
+## Tecnologias Aplicadas
 
-Por favor, realize o FORK desse repositório e implemente sua solução no FORK em seu repositório GItHub, ao final, notifique da conclusão para que possamos analisar o código implementado.
+- **Linguagem de Programação:** Java 21
+- **Framework Backend:** Spring Boot
+- **Persistência:** Spring Data JPA
+- **Banco de Dados:** PostgreSQL
+- **Injeção de Código:** Lombok
+- **Ferramenta de Monitoramento (Log):** SLF4J
+- **Documentação da API:** Swagger
+- **Ferramentas de Testes:** JUnit e Mockito
+- **Container:** Docker e Docker Compose
+- **Frontend:** React (Vite)
 
-Lembre de deixar todas as orientações necessárias para executar o seu código.
+## Pré-Requisitos
 
-### Tarefas bônus
+- Java 21 - JDK 21
+- Docker instalado com suporte ao Docker Compose
+- Node.js e npm (para o frontend)
 
-- Tarefa Bônus 1 - Integração com sistemas externos
-  - Criar uma Facade/Client Fake que retorna aleátoriamente se um CPF recebido é válido ou não.
-  - Caso o CPF seja inválido, a API retornará o HTTP Status 404 (Not found). Você pode usar geradores de CPF para gerar CPFs válidos
-  - Caso o CPF seja válido, a API retornará se o usuário pode (ABLE_TO_VOTE) ou não pode (UNABLE_TO_VOTE) executar a operação. Essa operação retorna resultados aleatórios, portanto um mesmo CPF pode funcionar em um teste e não funcionar no outro.
+## Inicialização
 
+### Subindo o Banco de Dados
+
+No diretório `backend`, execute `docker compose up -d` para iniciar o PostgreSQL necessário para a aplicação em segundo plano.
+
+### Iniciando o Backend
+
+Com o banco de dados em execução, no diretório `backend`, inicie a aplicação executando `./mvnw spring-boot:run`, que irá compilar e rodar a API usando Maven e Spring Boot.
+
+A aplicação utiliza o PostgreSQL iniciado pelo Docker Compose (`localhost:5432`) como banco de dados padrão.
+
+### Iniciando o Frontend
+
+No diretório `frontend`, execute `npm install` e depois `npm run dev`. A interface fica disponível em `http://localhost:5173`.
+
+### Testes da API
+
+A API pode ser acessada e testada diretamente pelo Swagger UI em `http://localhost:8080/swagger-ui.html` ou importando o arquivo DesafioVotacao.postman_collection.json no Postman ou Insomnia para execução das requisições..
+
+## Rodando os testes
+
+No diretório `backend`, execute: `./mvnw test`. Os testes de integração usam um banco H2 em memória.
+
+## Escolhas Técnicas
+
+### Arquitetura
+
+A escolha da arquitetura da API foi o padrão de camadas (controller, service, repository), pois esta é uma abordagem padrão de projetos Spring Boot, onde as responsabilidades são separadas e bem definidas.
+
+### Versionamento
+
+Optou-se por utilizar a versão na URL (`/api/v1`), com separação de pacotes por versão (`controller.api.v1`), facilitando a manutenção de múltiplas versões em paralelo no futuro. O prefixo de versão foi centralizado numa classe de constantes (`ApiPaths`), usada tanto pelos controllers quanto pelos testes — assim, uma eventual migração para `/api/v2` exige alteração em um único lugar, em vez de espalhada por toda a base de código.
+
+### Persistência
+
+A aplicação utiliza PostgreSQL como banco de dados, executado via Docker Compose. A escolha foi baseada na boa integração com Spring Boot e simplicidade de configuração utilizando containers.
+
+### Status da Sessão
+O status da sessão não é armazenado no banco. A aplicação calcula se a sessão está aberta ou encerrada comparando a data de término com o momento da consulta, evitando a necessidade de processos adicionais para atualizar esse estado.
+
+### Testes
+
+Os testes unitários foram implementados utilizando JUnit e Mockito para validar as regras de negócio de forma isolada.
+
+Os testes de integração utilizam H2 em memória, evitando dependências externas durante a execução da suíte de testes.
+
+### Validação de CPF
+
+A validação de CPF foi implementada através de uma anotação customizada (`@ValidCpf`), utilizando o algoritmo de dígito verificador diretamente na aplicação. Como a validação necessária é simples e pontual, optou-se por uma implementação própria em vez de adicionar uma dependência externa.
+### Documentação
+
+A utilização do Swagger foi adotada devido à simplicidade de implementação e à facilidade de visualização e teste dos endpoints da API.
+
+### Monitoramento (Logs)
+
+O SLF4J foi escolhido por fornecer uma abstração de logging que garante registros consistentes e padronizados para depuração e monitoramento da aplicação.
+
+### Integração Externa (Tarefa Bônus)
+
+Foi implementada uma API fake de validação de CPF (`CPFValidatorService`) para simular a comunicação com um serviço externo. A resposta indica aleatoriamente se o associado está apto ou não a votar, mantendo essa integração isolada do fluxo principal de votação.
+
+O endpoint disponibilizado é:
+
+```http
+GET /client/cpf/validate/{cpf}
 ```
-// CPF Ok para votar
-{
-    "status": "ABLE_TO_VOTE
-}
-// CPF Nao Ok para votar - retornar 404 no client tb
-{
-    "status": "UNABLE_TO_VOTE
-}
-```
 
-Exemplos de retorno do serviço
+### Performance (Tarefa Bônus)
 
-### Tarefa Bônus 2 - Performance
-
-- Imagine que sua aplicação possa ser usada em cenários que existam centenas de
-  milhares de votos. Ela deve se comportar de maneira performática nesses
-  cenários
-- Testes de performance são uma boa maneira de garantir e observar como sua
-  aplicação se comporta
-
-### Tarefa Bônus 3 - Versionamento da API
-
-○ Como você versionaria a API da sua aplicação? Que estratégia usar?
-
-## O que será analisado
-
-- Simplicidade no design da solução (evitar over engineering)
-- Organização do código
-- Arquitetura do projeto
-- Boas práticas de programação (manutenibilidade, legibilidade etc)
-- Possíveis bugs
-- Tratamento de erros e exceções
-- Explicação breve do porquê das escolhas tomadas durante o desenvolvimento da solução
-- Uso de testes automatizados e ferramentas de qualidade
-- Limpeza do código
-- Documentação do código e da API
-- Logs da aplicação
-- Mensagens e organização dos commits
-- Testes
-- Layout responsivo
-
-## Dicas
-
-- Teste bem sua solução, evite bugs
-
-  Observações importantes
-- Não inicie o teste sem sanar todas as dúvidas
-- Iremos executar a aplicação para testá-la, cuide com qualquer dependência externa e
-  deixe claro caso haja instruções especiais para execução do mesmo
-  Classificação da informação: Uso Interno
-
-
-
-# desafio-votacao
+- A apuração do resultado e a validação de voto duplicado são realizadas diretamente no banco de dados utilizando consultas de agregação (`COUNT`) e existência (`EXISTS`), evitando o processamento dos votos em memória.
+- Em um cenário com grande volume de dados, colunas frequentemente utilizadas nas consultas, como `associate_id`, `session_id` e `agenda_id`, podem receber índices específicos para melhorar o desempenho.
+- Os endpoints de listagem retornam todos os registros. Em um cenário com grande volume de dados, poderia ser implementada uma paginação com `Pageable`.
+- Testes de carga não foram implementados nesse projeto.
