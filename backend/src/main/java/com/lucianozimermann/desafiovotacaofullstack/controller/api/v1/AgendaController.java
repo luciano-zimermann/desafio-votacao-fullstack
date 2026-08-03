@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping(value = ApiPaths.AGENDAS)
@@ -23,6 +25,13 @@ public class AgendaController {
         log.info("GET /agendas/{} - Buscando pauta", id);
 
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AgendaResponseDTO>> findAll() {
+        log.info("GET /agendas - Listando todas as pautas");
+
+        return ResponseEntity.ok(service.findAll());
     }
 
     @PostMapping

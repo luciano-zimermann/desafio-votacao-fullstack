@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,11 +25,18 @@ public class AgendaService {
                                       return new AgendaNotFoundException();
                                   });
 
-        return AgendaResponseDTO.builder()
-                                .id(agenda.getId())
-                                .name(agenda.getName())
-                                .description(agenda.getDescription())
-                                .build();
+        return buildAgendaResponseDTO(agenda);
+    }
+
+    public List<AgendaResponseDTO> findAll() {
+        List<AgendaResponseDTO> agendas = repository.findAll()
+                                                    .stream()
+                                                    .map(this::buildAgendaResponseDTO)
+                                                    .toList();
+
+        log.info("Listagem de pautas retornadas. total={}", agendas.size());
+
+        return agendas;
     }
 
     public AgendaResponseDTO register(AgendaRequestDTO dto) {
