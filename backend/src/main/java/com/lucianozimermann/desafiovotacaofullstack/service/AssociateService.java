@@ -4,11 +4,14 @@ import com.lucianozimermann.desafiovotacaofullstack.dto.request.AssociateRequest
 import com.lucianozimermann.desafiovotacaofullstack.dto.response.AssociateResponseDTO;
 import com.lucianozimermann.desafiovotacaofullstack.entity.Associate;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateAlreadyExistsException;
+import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AssociateRepository;
 import com.lucianozimermann.desafiovotacaofullstack.utils.CpfUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -16,6 +19,27 @@ import org.springframework.stereotype.Service;
 public class AssociateService {
 
     private final AssociateRepository repository;
+
+    public AssociateResponseDTO findById(Long id) {
+        Associate associate = repository.findById(id)
+                                        .orElseThrow(() -> {
+                                            log.warn("Tenativa de buscar uma associado inexistente. id={}", id);
+                                            return new AssociateNotFoundException();
+                                        });
+
+        return buildAssociateResponseDTO(associate);
+    }
+
+    public List<AssociateResponseDTO> findAll() {
+        List<AssociateResponseDTO> associates = repository.findAll()
+                                                          .stream()
+                                                          .map(this::buildAssociateResponseDTO)
+                                                          .toList();
+
+        log.info("Listagem de associados retornadas. total={}", associates.size());
+
+        return associates;
+    }
 
     public AssociateResponseDTO register(AssociateRequestDTO dto) {
         String cpf = CpfUtils.stripCpfMask(dto.cpf());
