@@ -9,10 +9,8 @@ import com.lucianozimermann.desafiovotacaofullstack.entity.Session;
 import com.lucianozimermann.desafiovotacaofullstack.entity.Vote;
 import com.lucianozimermann.desafiovotacaofullstack.enums.SessionStatus;
 import com.lucianozimermann.desafiovotacaofullstack.enums.VoteValue;
-import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateNotFoundException;
-import com.lucianozimermann.desafiovotacaofullstack.exception.SessionClosedException;
-import com.lucianozimermann.desafiovotacaofullstack.exception.SessionNotFoundException;
-import com.lucianozimermann.desafiovotacaofullstack.exception.VoteAlreadyExistsException;
+import com.lucianozimermann.desafiovotacaofullstack.exception.*;
+import com.lucianozimermann.desafiovotacaofullstack.repository.AgendaRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AssociateRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.SessionRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.VoteRepository;
@@ -38,6 +36,9 @@ class VoteServiceTest {
 
     @Mock
     private VoteRepository repository;
+
+    @Mock
+    private AgendaRepository agendaRepository;
 
     @Mock
     private SessionRepository sessionRepository;
@@ -130,6 +131,7 @@ class VoteServiceTest {
         Mockito.when(repository.countBySessionAgendaIdAndVote(AGENDA_ID, VoteValue.NO)).thenReturn(1L);
         Mockito.when(sessionRepository.findFirstByAgendaIdOrderByStartDateDesc(AGENDA_ID))
                .thenReturn(Optional.of(buildOpenSession()));
+        Mockito.when(agendaRepository.findById(AGENDA_ID)).thenReturn(Optional.of(buildAgenda()));
 
         VoteResultResponseDTO result = service.getResult(AGENDA_ID);
 
@@ -147,6 +149,7 @@ class VoteServiceTest {
         Mockito.when(repository.countBySessionAgendaIdAndVote(AGENDA_ID, VoteValue.NO)).thenReturn(3L);
         Mockito.when(sessionRepository.findFirstByAgendaIdOrderByStartDateDesc(AGENDA_ID))
                .thenReturn(Optional.of(buildClosedSession()));
+        Mockito.when(agendaRepository.findById(AGENDA_ID)).thenReturn(Optional.of(buildAgenda()));
 
         VoteResultResponseDTO result = service.getResult(AGENDA_ID);
 
@@ -161,6 +164,7 @@ class VoteServiceTest {
         Mockito.when(repository.countBySessionAgendaIdAndVote(AGENDA_ID, VoteValue.NO)).thenReturn(2L);
         Mockito.when(sessionRepository.findFirstByAgendaIdOrderByStartDateDesc(AGENDA_ID))
                .thenReturn(Optional.of(buildClosedSession()));
+        Mockito.when(agendaRepository.findById(AGENDA_ID)).thenReturn(Optional.of(buildAgenda()));
 
         VoteResultResponseDTO result = service.getResult(AGENDA_ID);
 
@@ -174,10 +178,19 @@ class VoteServiceTest {
         Mockito.when(repository.countBySessionAgendaIdAndVote(AGENDA_ID, VoteValue.NO)).thenReturn(0L);
         Mockito.when(sessionRepository.findFirstByAgendaIdOrderByStartDateDesc(AGENDA_ID))
                .thenReturn(Optional.empty());
+        Mockito.when(agendaRepository.findById(AGENDA_ID)).thenReturn(Optional.of(buildAgenda()));
 
         VoteResultResponseDTO result = service.getResult(AGENDA_ID);
 
         Assertions.assertThat(result.sessionStatus()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando a pauta não existir ao consultar o resultado")
+    void shouldThrowExceptionWhenAgendaDoesNotExistOnGetResult() {
+        Mockito.when(agendaRepository.findById(AGENDA_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.getResult(AGENDA_ID)).isInstanceOf(AgendaNotFoundException.class);
     }
 
     private Agenda buildAgenda() {
