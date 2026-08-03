@@ -78,9 +78,7 @@ public class SessionService {
     }
 
     private SessionResponseDTO buildSessionResponseDTO(Session session) {
-        SessionStatus status = session.getEndDate().isAfter(LocalDateTime.now())
-                ? SessionStatus.OPEN
-                : SessionStatus.CLOSED;
+        SessionStatus status = session.isOpen() ? SessionStatus.OPEN : SessionStatus.CLOSED;
 
         return SessionResponseDTO.builder()
                                  .id(session.getId())
