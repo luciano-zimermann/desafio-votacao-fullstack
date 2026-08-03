@@ -7,6 +7,7 @@ import com.lucianozimermann.desafiovotacaofullstack.entity.Session;
 import com.lucianozimermann.desafiovotacaofullstack.enums.SessionStatus;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AgendaNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.exception.SessionAlreadyOpenException;
+import com.lucianozimermann.desafiovotacaofullstack.exception.SessionNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AgendaRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -24,6 +26,27 @@ public class SessionService {
 
     private final SessionRepository repository;
     private final AgendaRepository agendaRepository;
+
+    public SessionResponseDTO findById( Long id) {
+        Session session = repository.findById( id)
+                                    .orElseThrow(() -> {
+                                        log.warn("Tentativa de buscar uma sessão inexistente. id={}", id);
+                                        return new SessionNotFoundException();
+                                    });
+
+        return buildSessionResponseDTO(session);
+    }
+
+    public List<SessionResponseDTO> findAll() {
+        List<SessionResponseDTO> sessions = repository.findAll()
+                                                      .stream()
+                                                      .map(this::buildSessionResponseDTO)
+                                                      .toList();
+
+        log.info("Listagem de sessões retornadas. total={}", sessions.size());
+
+        return sessions;
+    }
 
     public SessionResponseDTO open(SessionRequestDTO dto) {
         Agenda agenda = agendaRepository.findById(dto.agendaId())
