@@ -4,6 +4,7 @@ import com.lucianozimermann.desafiovotacaofullstack.dto.request.AssociateRequest
 import com.lucianozimermann.desafiovotacaofullstack.dto.response.AssociateResponseDTO;
 import com.lucianozimermann.desafiovotacaofullstack.entity.Associate;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateAlreadyExistsException;
+import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AssociateRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class AssociateServiceTest {
@@ -45,6 +49,36 @@ class AssociateServiceTest {
 
         Mockito.verify(repository, Mockito.times(1)).existsByCpf(ASSOCIATE_CPF_NORMALIZED);
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.any(Associate.class));
+    }
+
+    @Test
+    @DisplayName("Deve retornar o associado pelo id")
+    void shouldFindAssociateById() {
+        Mockito.when(repository.findById(ASSOCIATE_ID)).thenReturn(Optional.of( buildAssociate()));
+
+        AssociateResponseDTO response = service.findById(ASSOCIATE_ID);
+
+        Assertions.assertThat(response.id()).isEqualTo(ASSOCIATE_ID);
+        Assertions.assertThat(response.name()).isEqualTo(ASSOCIATE_NAME);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando o associado não existir ao buscar por id")
+    void shouldThrowExceptionWhenAssociateDoesNotExistOnFindById() {
+        Mockito.when(repository.findById(ASSOCIATE_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.findById(ASSOCIATE_ID)).isInstanceOf(AssociateNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Deve retornar a lista de todos os associados cadastrados")
+    void shouldReturnAllAssociates() {
+        Mockito.when(repository.findAll()).thenReturn(List.of(buildAssociate()));
+
+        List<AssociateResponseDTO> response = service.findAll();
+
+        Assertions.assertThat(response).hasSize(1);
+        Assertions.assertThat(response.getFirst().id()).isEqualTo(ASSOCIATE_ID);
     }
 
     @Test

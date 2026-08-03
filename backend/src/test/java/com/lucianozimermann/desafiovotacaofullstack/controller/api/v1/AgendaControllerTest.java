@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
+
 @ExtendWith(MockitoExtension.class)
 class AgendaControllerTest {
 
@@ -85,6 +87,16 @@ class AgendaControllerTest {
                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         Mockito.verify(service, Mockito.never()).register(Mockito.any());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 200 com a lista de pautas")
+    void shouldReturn200WithAllAgendas() throws Exception {
+        Mockito.when(service.findAll()).thenReturn(List.of(buildAgendaResponse()));
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.AGENDAS))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(AGENDA_ID));
     }
 
     private AgendaResponseDTO buildAgendaResponse() {

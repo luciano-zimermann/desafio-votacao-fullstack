@@ -7,6 +7,7 @@ import com.lucianozimermann.desafiovotacaofullstack.entity.Session;
 import com.lucianozimermann.desafiovotacaofullstack.enums.SessionStatus;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AgendaNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.exception.SessionAlreadyOpenException;
+import com.lucianozimermann.desafiovotacaofullstack.exception.SessionNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AgendaRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.SessionRepository;
 import org.assertj.core.api.Assertions;
@@ -19,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +52,7 @@ class SessionServiceTest {
 
         SessionResponseDTO response = service.open(request);
 
-        Assertions.assertThat( response).isNotNull();
+        Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.id()).isEqualTo(SESSION_ID);
         Assertions.assertThat(response.agendaId()).isEqualTo(AGENDA_ID);
         Assertions.assertThat(response.duration()).isEqualTo(DEFAULT_DURATION);
@@ -73,6 +75,36 @@ class SessionServiceTest {
 
         Assertions.assertThat(response.duration()).isEqualTo(CUSTOM_DURATION);
         Assertions.assertThat(response.status()).isEqualTo(SessionStatus.OPEN);
+    }
+
+    @Test
+    @DisplayName("Deve retornar a sessão pelo id")
+    void shouldFindSessionById() {
+        Mockito.when(repository.findById(SESSION_ID)).thenReturn(Optional.of(buildSession(DEFAULT_DURATION)));
+
+        SessionResponseDTO response = service.findById(SESSION_ID);
+
+        Assertions.assertThat(response.id()).isEqualTo(SESSION_ID);
+        Assertions.assertThat(response.status()).isEqualTo(SessionStatus.OPEN);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando a sessão não existir ao buscar por id")
+    void shouldThrowExceptionWhenSessionDoesNotExistOnFindById() {
+        Mockito.when(repository.findById(SESSION_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.findById(SESSION_ID)).isInstanceOf(SessionNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Deve retornar a lista de todas as sessões cadastradas")
+    void shouldReturnAllSessions() {
+        Mockito.when(repository.findAll()).thenReturn(List.of(buildSession(DEFAULT_DURATION)));
+
+        List<SessionResponseDTO> response = service.findAll();
+
+        Assertions.assertThat(response).hasSize(1);
+        Assertions.assertThat(response.getFirst().id()).isEqualTo(SESSION_ID);
     }
 
     @Test

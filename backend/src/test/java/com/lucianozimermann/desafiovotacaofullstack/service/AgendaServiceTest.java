@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +64,20 @@ class AgendaServiceTest {
         Assertions.assertThat(response.description()).isEqualTo(AGENDA_DESCRIPTION);
 
         Mockito.verify(repository, Mockito.times(1)).findById(AGENDA_ID);
+    }
+
+    @Test
+    @DisplayName("Deve retornar a lista de todas as pautas cadastradas")
+    void shouldReturnAllAgendas() {
+        Mockito.when(repository.findAll()).thenReturn( List.of( buildAgenda()));
+
+        List<AgendaResponseDTO> response = service.findAll();
+
+        Assertions.assertThat(response).hasSize(1);
+        Assertions.assertThat(response.getFirst().id()).isEqualTo(AGENDA_ID);
+        Assertions.assertThat(response.getFirst().name()).isEqualTo(AGENDA_NAME);
+
+        Mockito.verify(repository, Mockito.times(1)).findAll();
     }
 
     @Test

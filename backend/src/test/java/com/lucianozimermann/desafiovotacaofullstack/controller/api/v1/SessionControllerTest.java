@@ -7,6 +7,7 @@ import com.lucianozimermann.desafiovotacaofullstack.enums.SessionStatus;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AgendaNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.exception.GlobalExceptionHandler;
 import com.lucianozimermann.desafiovotacaofullstack.exception.SessionAlreadyOpenException;
+import com.lucianozimermann.desafiovotacaofullstack.exception.SessionNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.service.SessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class SessionControllerTest {
@@ -57,6 +59,35 @@ class SessionControllerTest {
                .andExpect(MockMvcResultMatchers.status().isCreated())
                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(SESSION_ID))
                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value("OPEN"));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 200 quando a sessão existir")
+    void shouldReturn200WhenSessionExists() throws Exception {
+        Mockito.when(service.findById(SESSION_ID)).thenReturn(buildSessionResponse());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.SESSIONS + "/{id}", SESSION_ID))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(SESSION_ID));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 quando a sessão não existir")
+    void shouldReturn404WhenSessionNotFoundOnFindById() throws Exception {
+        Mockito.when(service.findById(SESSION_ID)).thenThrow(new SessionNotFoundException());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.SESSIONS + "/{id}", SESSION_ID))
+               .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 200 com a lista de sessões")
+    void shouldReturn200WithAllSessions() throws Exception {
+        Mockito.when(service.findAll()).thenReturn(List.of( buildSessionResponse()));
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.SESSIONS))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(SESSION_ID));
     }
 
     @Test

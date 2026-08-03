@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lucianozimermann.desafiovotacaofullstack.dto.request.AssociateRequestDTO;
 import com.lucianozimermann.desafiovotacaofullstack.dto.response.AssociateResponseDTO;
 import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateAlreadyExistsException;
+import com.lucianozimermann.desafiovotacaofullstack.exception.AssociateNotFoundException;
 import com.lucianozimermann.desafiovotacaofullstack.exception.GlobalExceptionHandler;
 import com.lucianozimermann.desafiovotacaofullstack.service.AssociateService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class AssociateControllerTest {
@@ -67,6 +70,35 @@ class AssociateControllerTest {
                                               .contentType(MediaType.APPLICATION_JSON)
                                               .content(objectMapper.writeValueAsString(request)))
                .andExpect(MockMvcResultMatchers.status().isConflict());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 200 quando o associado existir")
+    void shouldReturn200WhenAssociateExists() throws Exception {
+        Mockito.when(service.findById(ASSOCIATE_ID)).thenReturn(buildAssociateResponse());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.ASSOCIATES + "/{id}", ASSOCIATE_ID))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(ASSOCIATE_ID));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 quando o associado não existir")
+    void shouldReturn404WhenAssociateNotFoundOnFindById() throws Exception {
+        Mockito.when(service.findById(ASSOCIATE_ID)).thenThrow(new AssociateNotFoundException());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.ASSOCIATES + "/{id}", ASSOCIATE_ID))
+               .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 200 com a lista de associados")
+    void shouldReturn200WithAllAssociates() throws Exception {
+        Mockito.when(service.findAll()).thenReturn(List.of( buildAssociateResponse()));
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ApiPaths.ASSOCIATES))
+               .andExpect(MockMvcResultMatchers.status().isOk())
+               .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(ASSOCIATE_ID));
     }
 
     @Test
