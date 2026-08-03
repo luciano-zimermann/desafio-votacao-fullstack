@@ -1,4 +1,4 @@
-package com.lucianozimermann.desafiovotacaofullstack.controller.api.v1;
+package com.lucianozimermann.desafiovotacaofullstack.controller.api.v1.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
