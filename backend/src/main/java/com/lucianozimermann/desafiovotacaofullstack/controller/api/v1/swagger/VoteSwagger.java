@@ -40,6 +40,8 @@ public interface VoteSwagger {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Resultado retornado com sucesso",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = VoteResultResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Pauta não encontrada",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
