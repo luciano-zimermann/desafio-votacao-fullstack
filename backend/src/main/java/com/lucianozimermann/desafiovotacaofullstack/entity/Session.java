@@ -29,4 +29,8 @@ public class Session {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
+
+    public boolean isOpen() {
+        return endDate.isAfter(LocalDateTime.now());
+    }
 }

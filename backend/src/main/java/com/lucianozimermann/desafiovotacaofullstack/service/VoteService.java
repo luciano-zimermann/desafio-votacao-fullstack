@@ -12,7 +12,6 @@ import com.lucianozimermann.desafiovotacaofullstack.exception.*;
 import com.lucianozimermann.desafiovotacaofullstack.repository.AssociateRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.SessionRepository;
 import com.lucianozimermann.desafiovotacaofullstack.repository.VoteRepository;
-import com.lucianozimermann.desafiovotacaofullstack.utils.SessionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class VoteService {
                                                      return new AssociateNotFoundException();
                                                  });
 
-        if (!SessionUtils.isOpen(session)) {
+        if (!session.isOpen()) {
             log.warn("Tentativa de voto em uma sessão encerrada. sessionId={}", session.getId());
             throw new SessionClosedException();
         }
@@ -72,8 +71,8 @@ public class VoteService {
         String result = yesVotes > noVotes ? "Aprovada" : "Rejeitada";
 
         SessionStatus sessionStatus = sessionRepository.findFirstByAgendaIdOrderByStartDateDesc(agendaId)
-                                                       .map(session -> SessionUtils.isOpen(session) ? SessionStatus.OPEN
-                                                                                                    : SessionStatus.CLOSED)
+                                                       .map(session -> session.isOpen() ? SessionStatus.OPEN
+                                                                                        : SessionStatus.CLOSED)
                                                        .orElse(null);
 
         log.info("Resultado da Pauta apurado. agendaId={}, totalVotes={}, result={}", agendaId, totalVotes, result);
